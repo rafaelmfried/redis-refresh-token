@@ -1,17 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TypeOrmConfigService } from './config/typeorm-config.service';
 import { UsersModule } from './users/users.module';
+import { CommonModule } from './commom/common.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRootAsync({
-      useClass: TypeOrmConfigService,
-    }),
-    UsersModule,
-  ],
+  imports: [CommonModule, DatabaseModule, UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,25 +12,71 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    const user = this.userRepository.create(createUserDto);
-    return this.userRepository.save(user);
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const user = await this.userRepository.create(createUserDto);
+      return await this.userRepository.save(user);
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'Não foi possivel criar o usuario.',
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+      console.error(error);
+    }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return await this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    try {
+      const user = await this.userRepository.findOneBy({
+        id,
+      });
+      return user;
+    } catch (error) {
+      throw new Error('Usuario não encontrado!');
+      console.error(error);
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-    return `This action updates a #${id} user`;
+  async findOneByUsername(username: string) {
+    try {
+      const user = await this.userRepository.findOneByOrFail({
+        username,
+      });
+      return user;
+    } catch (error) {
+      throw new Error('Usuario não encontrado');
+      console.error(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      return await this.userRepository.update({ id }, updateUserDto);
+    } catch (error) {
+      throw new Error('Não foi possivel atualizar o usuario.');
+      console.error(error);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      const user = await this.userRepository.findOneByOrFail({
+        id,
+      });
+      return await this.userRepository.remove(user);
+    } catch (error) {
+      throw new Error('Não foi possivel deletar o usuario.');
+      console.error(error);
+    }
   }
 }

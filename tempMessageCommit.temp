@@ -1,15 +1,9 @@
-Certainly! I'd be happy to help you create a commit message for the git diff. However, you haven't provided the actual git diff output. Without seeing the changes, I can't create a specific and meaningful commit message.
+Update Docker and compose configs, add bcrypt, enhance user module
 
-To create an appropriate commit message, I would need to see the diff output, which typically shows:
-
-1. The files that were changed
-2. The specific lines that were added, modified, or deleted
-
-Once you provide the git diff, I can analyze the changes and help you craft a concise and descriptive commit message that follows best practices. A good commit message usually includes:
-
-1. A brief summary (50 characters or less) as the first line
-2. A blank line following the summary
-3. A more detailed explanation of the changes, if necessary
-
-Please share the git diff output, and I'll be glad to help you create a suitable commit message.
-
+- Change CMD in Dockerfile to use npm start:dev
+- Add network configuration to compose.yaml
+- Install bcryptjs and @types/bcrypt
+- Refactor app.module and database.module
+- Enhance user DTOs with validation and custom validator
+- Implement CRUD operations in users.service with error handling
+- Add HttpExceptionFilter to users.controller

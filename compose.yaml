@@ -13,6 +13,8 @@ services:
       - redis
     restart: always
     command: npm start
+    networks:
+      - app_network
   
   database:
     image: postgres:10.17
@@ -25,12 +27,20 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
     restart: always
+    networks:
+      - app_network
   
   redis:
     image: redis:alpine
     ports:
       - 6379:6379
     restart: always
+    networks:
+      - app_network
 
 volumes:
   pg-data:
+
+networks:
+  app_network:
+    driver: bridge
