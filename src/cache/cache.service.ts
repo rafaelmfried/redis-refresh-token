@@ -6,9 +6,9 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  async retrieveData(bearer: string): Promise<string> {
+  async retrieveToken(token: string): Promise<string> {
     const storedData = await this.cacheManager.get<{ refresh_token?: string }>(
-      bearer,
+      token,
     );
     return storedData?.refresh_token || null;
   }
