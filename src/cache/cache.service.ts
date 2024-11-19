@@ -1,26 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCacheDto } from './dto/create-cache.dto';
-import { UpdateCacheDto } from './dto/update-cache.dto';
+import { Injectable, Inject } from '@nestjs/common';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CacheService {
-  create(createCacheDto: CreateCacheDto) {
-    return 'This action adds a new cache';
-  }
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-  findAll() {
-    return `This action returns all cache`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} cache`;
-  }
-
-  update(id: number, updateCacheDto: UpdateCacheDto) {
-    return `This action updates a #${id} cache`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} cache`;
+  async retrieveData(bearer: string): Promise<string> {
+    const storedData = await this.cacheManager.get<{ refresh_token?: string }>(
+      bearer,
+    );
+    return storedData?.refresh_token || null;
   }
 }
