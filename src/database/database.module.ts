@@ -4,10 +4,12 @@ import { DataSourceConfigService } from 'src/config/datasource-config.service';
 import { TypeOrmConfigService } from 'src/config/typeorm-config.service';
 import { DataSource } from 'typeorm';
 import { Logger } from '@nestjs/common';
+import { ConfigModule } from 'src/config/config.module';
 
 @Global()
 @Module({
   imports: [
+    ConfigModule,
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
     }),
