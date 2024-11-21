@@ -6,6 +6,7 @@ import { CommonModule } from './commom/common.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from './config/config.module';
 import { AppCacheModule } from './cache/cache.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AppCacheModule } from './cache/cache.module';
     CommonModule,
     UsersModule,
     AppCacheModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
