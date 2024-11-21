@@ -1,17 +1,26 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { CacheService } from './cache.service';
+import { RefreshTokenCache } from './dto/refresh_token_cache.dto';
 
 @Controller('cache')
 export class CacheController {
   constructor(private readonly cacheService: CacheService) {}
 
-  @Get()
-  async getCache(@Body() refresh_token: string): Promise<any> {
-    return this.cacheService.retrieveToken(refresh_token);
+  @Post('get')
+  async getCache(@Body() refreshTokenCache: RefreshTokenCache): Promise<any> {
+    console.log(refreshTokenCache.refresh_token);
+    return (await this.cacheService.retrieveToken(
+      refreshTokenCache.refresh_token,
+    ))
+      ? 'Encontrado'
+      : 'Não encontrado';
   }
 
-  @Post()
-  async setCache(@Body() refresh_token: string): Promise<any> {
-    return this.cacheService.storeToken(refresh_token);
+  @Post('set')
+  async setCache(@Body() refreshTokenCache: RefreshTokenCache): Promise<any> {
+    console.log(refreshTokenCache.refresh_token);
+    return (await this.cacheService.storeToken(refreshTokenCache.refresh_token))
+      ? 'Token setado'
+      : 'Token não setado';
   }
 }

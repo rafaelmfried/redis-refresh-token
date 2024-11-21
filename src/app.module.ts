@@ -27,7 +27,6 @@ import { AppCacheModule } from './cache/cache.module';
     CommonModule,
     UsersModule,
     AppCacheModule,
-    // AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

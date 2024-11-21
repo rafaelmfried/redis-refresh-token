@@ -1,6 +1,9 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: redis-refresh-token
     ports:
       - "3000:3000"
     volumes:
@@ -40,6 +43,7 @@ services:
 
 volumes:
   pg-data:
+    driver: local
 
 networks:
   app_network:
