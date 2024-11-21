@@ -1,8 +1,8 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSourceConfigService } from 'src/config/datasource-config.service';
-import { TypeOrmConfigService } from 'src/config/typeorm-config.service';
-import { DataSource } from 'typeorm';
+import { DataSourceConfigService } from '../config/services/datasource-config.service';
+import { TypeOrmConfigService } from 'src/config/services/typeorm-config.service';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import { ConfigModule } from 'src/config/config.module';
 
@@ -20,7 +20,7 @@ import { ConfigModule } from 'src/config/config.module';
       useFactory: async () => {
         try {
           const dataSourceConfigService = new DataSourceConfigService();
-          const dataSourceConfig =
+          const dataSourceConfig: DataSourceOptions =
             dataSourceConfigService.createDataSourceOptions();
           const dataSource = new DataSource(dataSourceConfig);
           await dataSource.initialize();

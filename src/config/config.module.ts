@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { DataSourceConfigService } from './datasource-config.service';
-import { TypeOrmConfigService } from './typeorm-config.service';
+import { DataSourceConfigService } from './services/datasource-config.service';
+import { TypeOrmConfigService } from './services/typeorm-config.service';
 
 @Module({
   providers: [DataSourceConfigService, TypeOrmConfigService],

@@ -4,3 +4,5 @@ Dockerfile
 .dockerignore
 compose.yaml
 .gitignore
+.env*
+/dist

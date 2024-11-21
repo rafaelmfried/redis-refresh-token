@@ -12,6 +12,6 @@ export class CacheController {
 
   @Post()
   async setCache(@Body() refresh_token: string): Promise<any> {
-    return this.cacheService.storeData(refresh_token);
+    return this.cacheService.storeToken(refresh_token);
   }
 }

@@ -2,7 +2,7 @@
   "name": "redis-refresh-token",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "rafaelmfried",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
