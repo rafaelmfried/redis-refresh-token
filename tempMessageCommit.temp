@@ -1,9 +1,0 @@
-Update Docker and compose configs, add bcrypt, enhance user module
-
-- Change CMD in Dockerfile to use npm start:dev
-- Add network configuration to compose.yaml
-- Install bcryptjs and @types/bcrypt
-- Refactor app.module and database.module
-- Enhance user DTOs with validation and custom validator
-- Implement CRUD operations in users.service with error handling
-- Add HttpExceptionFilter to users.controller
