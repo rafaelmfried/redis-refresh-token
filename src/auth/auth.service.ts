@@ -3,6 +3,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { UsersService } from 'src/users/users.service';
 import { CacheService } from 'src/cache/cache.service';
 import { JwtService } from '@nestjs/jwt';
+import { BcryptService } from 'src/commom/utils/bcrypt.service';
 
 @Injectable()
 export class AuthService {
@@ -10,6 +11,7 @@ export class AuthService {
     private userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly redisCache: CacheService,
+    private readonly bcryptService: BcryptService,
   ) {}
 
   async signIn(loginAuthDto: LoginAuthDto) {
@@ -19,12 +21,18 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException();
 
-    const { email, username, id } = user;
-    const payload = { username, email, id };
-    const token = {
-      access_token: await this.jwtService.signAsync(payload),
-    };
-    await this.redisCache.storeToken(token.access_token);
-    return token;
+    const { password: hashPassword, ...payload } = user;
+
+    const isValidToken = await this.bcryptService.comparePassword(
+      loginAuthDto.password,
+      hashPassword,
+    );
+
+    if (!isValidToken) throw new UnauthorizedException();
+
+    const access_token = await this.jwtService.signAsync(payload);
+    const refresh_token = await this.jwtService.signAsync(payload);
+    await this.redisCache.storeToken(refresh_token);
+    return { access_token };
   }
 }

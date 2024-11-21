@@ -1,8 +1,9 @@
 import { HttpException, Injectable, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { BcryptService } from 'src/commom/utils/bcrypt.service';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -10,24 +11,31 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly bcryptService: BcryptService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const user = await this.userRepository.create(createUserDto);
+      const { password } = createUserDto;
+      console.log('Password: ', password);
+      const hashedPassword = await this.bcryptService.hashPassword(password);
+      console.log('hashedPasswrod: ', hashedPassword);
+      const userData = { password: hashedPassword, ...createUserDto };
+      console.log('userData: ', userData);
+      const user = await this.userRepository.create(userData);
       return await this.userRepository.save(user);
     } catch (error) {
+      console.error(error);
       throw new HttpException(
         {
           status: HttpStatus.FORBIDDEN,
-          error: 'Não foi possivel criar o usuario.',
+          error: error.message,
         },
         HttpStatus.FORBIDDEN,
         {
           cause: error,
         },
       );
-      console.error(error);
     }
   }
 
@@ -42,8 +50,8 @@ export class UsersService {
       });
       return user;
     } catch (error) {
-      throw new Error('Usuario não encontrado!');
       console.error(error);
+      throw new Error('Usuario não encontrado!');
     }
   }
 
@@ -54,8 +62,8 @@ export class UsersService {
       });
       return user;
     } catch (error) {
-      throw new Error('Usuario não encontrado');
       console.error(error);
+      throw new Error('Usuario não encontrado');
     }
   }
 
@@ -63,8 +71,8 @@ export class UsersService {
     try {
       return await this.userRepository.update({ id }, updateUserDto);
     } catch (error) {
-      throw new Error('Não foi possivel atualizar o usuario.');
       console.error(error);
+      throw new Error('Não foi possivel atualizar o usuario.');
     }
   }
 
@@ -75,8 +83,8 @@ export class UsersService {
       });
       return await this.userRepository.remove(user);
     } catch (error) {
-      throw new Error('Não foi possivel deletar o usuario.');
       console.error(error);
+      throw new Error('Não foi possivel deletar o usuario.');
     }
   }
 }

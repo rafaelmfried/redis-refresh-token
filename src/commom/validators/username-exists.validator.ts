@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
@@ -7,13 +8,17 @@ import {
 } from 'class-validator';
 import { UsersService } from 'src/users/users.service';
 
+// N consigo pegar o contexto de usermodule aqui
+
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class UsernameExistsValidator implements ValidatorConstraintInterface {
-  constructor(private readonly usersService: UsersService) {}
+  private readonly userService: UsersService;
+  constructor(private readonly moduleRef: ModuleRef) {}
 
   async validate(username: string) {
-    const user = await this.usersService.findOneByUsername(username);
+    console.log('username: ', username);
+    const user = await this.userService.findOneByUsername(username);
     return !user;
   }
 

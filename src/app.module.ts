@@ -7,17 +7,18 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from './config/config.module';
 import { AppCacheModule } from './cache/cache.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule,
     DatabaseModule,
-    CommonModule,
     UsersModule,
-    AppCacheModule,
+    CommonModule,
     AuthModule,
+    AppCacheModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConfigService],
 })
 export class AppModule {}

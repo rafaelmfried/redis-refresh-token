@@ -28,10 +28,13 @@ export class AuthGuard implements CanActivate {
       try {
         const redisToken = await this.redisCache.retrieveToken(refreshToken);
         if (!redisToken) throw new UnauthorizedException();
+        // Tendo o refresh token no redis, gerar um novo access_token e refresh token, salvar o novo no redis, apagar o antigo e enviar
+        // para o usuario o novo access_token e refresh_token
         const newToken = await this.jwtService.signAsync(payload);
         await this.redisCache.storeToken(newToken);
 
         request['user'] = payload;
+        request['refresh_token'] = newToken;
       } catch (error) {
         throw new UnauthorizedException();
       }

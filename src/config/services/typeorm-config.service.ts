@@ -11,8 +11,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: 'postgres',
       password: 'postgres',
       database: 'maindb',
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
       synchronize: true,
+      autoLoadEntities: true,
     };
   }
 }
