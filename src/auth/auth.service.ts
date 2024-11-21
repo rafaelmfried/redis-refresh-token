@@ -1,26 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { UsersService } from 'src/users/users.service';
+import { CacheService } from 'src/cache/cache.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(
+    private userService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly redisCache: CacheService,
+  ) {}
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async signIn(loginAuthDto: LoginAuthDto) {
+    const user = await this.userService.findOneByUsername(
+      loginAuthDto.username,
+    );
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    if (!user) throw new UnauthorizedException();
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const { email, username, id } = user;
+    const payload = { username, email, id };
+    const token = {
+      access_token: await this.jwtService.signAsync(payload),
+    };
+    await this.redisCache.storeToken(token.access_token);
+    return token;
   }
 }
