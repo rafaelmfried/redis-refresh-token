@@ -1,44 +1,30 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   ValidatorConstraint,
   ValidationOptions,
   registerDecorator,
+  ValidationArguments,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { UsersService } from 'src/users/users.service';
-
-// N consigo pegar o contexto de usermodule aqui
+import { UsersService } from '../users.service';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
 export class UsernameExistsValidator implements ValidatorConstraintInterface {
-  constructor(
-    @Inject(forwardRef(() => UsersService))
-    private readonly usersService: UsersService,
-  ) {
-    console.log(this.usersService);
-  }
+  constructor(@Inject(UsersService) private usersService: UsersService) {}
 
-  async validate(username: string) {
-    console.log('username: ', username);
-    console.log('user repo: ', this.usersService);
+  async validate(username: string): Promise<boolean> {
     try {
       const user = await this.usersService.findOneByUsername(username);
       return !user;
     } catch (error) {
-      console.log('error: ', error);
       throw new HttpException('Usuario ja existe', HttpStatus.NOT_ACCEPTABLE);
     }
   }
 
-  defaultMessage(): string {
-    return 'Este nome de usuário já está em uso';
+  defaultMessage(args: ValidationArguments): string {
+    console.log(args);
+    return 'O Usuario já existe: ($value).';
   }
 }
 

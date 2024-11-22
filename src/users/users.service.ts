@@ -64,7 +64,7 @@ export class UsersService {
 
   async findOneByUsername(username: string) {
     try {
-      const user = await this.userRepository.findOneByOrFail({
+      const user = await this.userRepository.findOneBy({
         username,
       });
       return user;

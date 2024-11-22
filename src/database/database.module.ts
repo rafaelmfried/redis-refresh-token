@@ -33,6 +33,6 @@ import { RedisService } from './services/redis.service';
     //   },
     // },
   ],
-  exports: [DatabaseService, DataSourceConfigService],
+  exports: [DatabaseService],
 })
 export class DatabaseModule {}

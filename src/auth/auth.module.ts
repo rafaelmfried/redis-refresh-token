@@ -13,10 +13,10 @@ import { User } from 'src/users/entities/user.entity';
 
 @Module({
   imports: [
+    UsersModule,
     forwardRef(() => CommonModule),
     TypeOrmModule.forFeature([User]),
     DatabaseModule,
-    UsersModule,
     JwtModule.register({
       global: true,
       secret: process.env.SECRET_KEY || 'chave',
