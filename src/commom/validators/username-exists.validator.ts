@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable, Scope } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import {
   ValidatorConstraint,
   ValidationOptions,
@@ -10,18 +16,25 @@ import { UsersService } from 'src/users/users.service';
 // N consigo pegar o contexto de usermodule aqui
 
 @ValidatorConstraint({ async: true })
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable()
 export class UsernameExistsValidator implements ValidatorConstraintInterface {
   constructor(
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
-  ) {}
+  ) {
+    console.log(this.usersService);
+  }
 
   async validate(username: string) {
     console.log('username: ', username);
     console.log('user repo: ', this.usersService);
-    const user = await this.usersService.findOneByUsername(username);
-    return !user;
+    try {
+      const user = await this.usersService.findOneByUsername(username);
+      return !user;
+    } catch (error) {
+      console.log('error: ', error);
+      throw new HttpException('Usuario ja existe', HttpStatus.NOT_ACCEPTABLE);
+    }
   }
 
   defaultMessage(): string {

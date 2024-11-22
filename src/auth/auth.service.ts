@@ -15,24 +15,29 @@ export class AuthService {
   ) {}
 
   async signIn(loginAuthDto: LoginAuthDto) {
-    const user = await this.userService.findOneByUsername(
-      loginAuthDto.username,
-    );
+    try {
+      const user = await this.userService.findOneByUsername(
+        loginAuthDto.username,
+      );
 
-    if (!user) throw new UnauthorizedException();
+      if (!user) throw new UnauthorizedException();
 
-    const { password: hashPassword, ...payload } = user;
+      const { password: hashPassword, ...payload } = user;
 
-    const isValidToken = await this.bcryptService.comparePassword(
-      loginAuthDto.password,
-      hashPassword,
-    );
+      const isValidToken = await this.bcryptService.comparePassword(
+        loginAuthDto.password,
+        hashPassword,
+      );
 
-    if (!isValidToken) throw new UnauthorizedException();
+      if (!isValidToken) throw new UnauthorizedException();
 
-    const access_token = await this.jwtService.signAsync(payload);
-    const refresh_token = await this.jwtService.signAsync(payload);
-    await this.redisCache.storeToken(refresh_token);
-    return { access_token };
+      const access_token = await this.jwtService.signAsync(payload);
+      const refresh_token = await this.jwtService.signAsync(payload);
+      await this.redisCache.storeToken(refresh_token);
+      return { access_token };
+    } catch (error) {
+      console.error(error);
+      throw new UnauthorizedException();
+    }
   }
 }

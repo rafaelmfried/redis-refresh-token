@@ -5,7 +5,7 @@ import {
   MinLength,
   Matches,
 } from 'class-validator';
-// import { UsernameExists } from 'src/commom/validators/username-exists.validator';
+import { UsernameExists } from 'src/commom/validators/username-exists.validator';
 
 export class CreateUserDto {
   @IsEmail({}, { message: 'O email deve ser válidado' })
@@ -14,7 +14,7 @@ export class CreateUserDto {
 
   @IsString({ message: 'O nome de usuário deve ser uma string' })
   @IsNotEmpty({ message: 'O nome de usuário ê obrigatório' })
-  // @UsernameExists({ message: 'Nome de usuário já existe' })
+  @UsernameExists({ message: 'Nome de usuário já existe' })
   username: string;
 
   @IsNotEmpty({ message: 'A senha é obrigatoria' })
