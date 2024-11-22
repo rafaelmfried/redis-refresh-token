@@ -1,4 +1,10 @@
-import { HttpException, Injectable, HttpStatus } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  HttpStatus,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -11,6 +17,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => BcryptService))
     private readonly bcryptService: BcryptService,
   ) {}
 
@@ -20,7 +27,7 @@ export class UsersService {
       console.log('Password: ', password);
       const hashedPassword = await this.bcryptService.hashPassword(password);
       console.log('hashedPasswrod: ', hashedPassword);
-      const userData = { password: hashedPassword, ...createUserDto };
+      const userData = { ...createUserDto, password: hashedPassword };
       console.log('userData: ', userData);
       const user = await this.userRepository.create(userData);
       return await this.userRepository.save(user);

@@ -6,6 +6,7 @@ services:
     container_name: redis-refresh-token
     ports:
       - "3000:3000"
+      - "8000:8000"
     volumes:
       - .:/app
     environment:

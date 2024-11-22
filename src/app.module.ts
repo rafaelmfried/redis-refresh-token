@@ -8,9 +8,14 @@ import { ConfigModule } from './config/config.module';
 import { AppCacheModule } from './cache/cache.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigService } from '@nestjs/config';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 
 @Module({
   imports: [
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
+      port: 8000,
+    }),
     ConfigModule,
     DatabaseModule,
     UsersModule,

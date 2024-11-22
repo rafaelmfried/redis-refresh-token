@@ -15,13 +15,13 @@ import { User } from 'src/users/entities/user.entity';
   imports: [
     forwardRef(() => CommonModule),
     TypeOrmModule.forFeature([User]),
+    DatabaseModule,
+    UsersModule,
     JwtModule.register({
       global: true,
       secret: process.env.SECRET_KEY || 'chave',
       signOptions: { expiresIn: '1h' },
     }),
-    UsersModule,
-    DatabaseModule,
     AppCacheModule,
   ],
   controllers: [AuthController],

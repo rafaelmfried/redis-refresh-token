@@ -1,24 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
+import { forwardRef, Inject, Injectable, Scope } from '@nestjs/common';
 import {
   ValidatorConstraint,
-  ValidatorConstraintInterface,
   ValidationOptions,
   registerDecorator,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 import { UsersService } from 'src/users/users.service';
 
 // N consigo pegar o contexto de usermodule aqui
 
 @ValidatorConstraint({ async: true })
-@Injectable()
+@Injectable({ scope: Scope.TRANSIENT })
 export class UsernameExistsValidator implements ValidatorConstraintInterface {
-  private readonly userService: UsersService;
-  constructor(private readonly moduleRef: ModuleRef) {}
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
+  ) {}
 
   async validate(username: string) {
     console.log('username: ', username);
-    const user = await this.userService.findOneByUsername(username);
+    console.log('user repo: ', this.usersService);
+    const user = await this.usersService.findOneByUsername(username);
     return !user;
   }
 
