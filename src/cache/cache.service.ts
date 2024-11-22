@@ -14,6 +14,7 @@ export class CacheService {
 
   async storeToken(refresh_token: string): Promise<boolean> {
     try {
+      console.log(process.env.REDIS_TTL);
       await this.cacheManager.set(
         refresh_token,
         { refresh_token },
@@ -22,6 +23,15 @@ export class CacheService {
       return true;
     } catch (error) {
       console.error(error);
+      return false;
+    }
+  }
+
+  async deleteToken(refresh_token: string): Promise<boolean> {
+    try {
+      await this.cacheManager.del(refresh_token);
+      return true;
+    } catch (error) {
       return false;
     }
   }

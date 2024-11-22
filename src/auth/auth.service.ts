@@ -48,4 +48,8 @@ export class AuthService {
       throw new UnauthorizedException('Problemas nas credenciais fornecidas');
     }
   }
+
+  async generateRefreshToken() {}
+
+  async generateAccessToken() {}
 }

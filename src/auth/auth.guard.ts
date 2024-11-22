@@ -5,10 +5,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { CacheService } from 'src/cache/cache.service';
-// Consertar a rotina de funcionamento do access_token e refresh_token, somente precisa verificar a existencia do refresh caso o access_token esteja expirado, caso contrario retornar uma excessao
-// JWT ta gerando um erro que quando n tratado explode na aplicacao e n permite que o payload seja validado pelas rotinas seguintes, ver como corrigir isso de forma elegante.
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
@@ -18,59 +17,84 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
+      // RETIRA OS OBJETOS REQUEST E RESPONSE E RETIRA O TOKEN E REFRESH TOKEN DO HEADER DA REQUEST.
       const request = context.switchToHttp().getRequest<Request>();
       const response = context.switchToHttp().getResponse<Response>();
       const token = this.extractTokenFromHeader(request);
       const refreshToken = this.extractRefreshTokenFromHeader(request);
 
       if (!token) throw new UnauthorizedException('Usuario não autenticado');
+
       try {
-        // Verifica a validade do jwt caso ele exista
+        // VERIFICA SE O TOKEN É VALIDO OU ESTA DENTRO DO PRAZO DE EXPIRAÇÃO.
         await this.jwtService.verifyAsync(token, {
           secret: process.env.SECRET_KEY,
         });
+        // SE O JWT LANÇAR UMA EXCESSÃO, VAMOS VERIFICAR SE EXISTE O REFRESH TOKEN
       } catch (error) {
+        // NÃO TIVER NEM O TOKEN E NEM O REFRESH TOKEN EU POSSO LANÇAR QUE O USUARIO NÃO ESTA AUTENTICADO
         if (!refreshToken)
           throw new UnauthorizedException('Usuario não autenticado');
+        // CASO TENHA O REFRESH TOKEN, VAMOS VERIFICAR SE ELE EXISTE NO REDIS
         const redisToken = await this.redisCache.retrieveToken(refreshToken);
+
+        // SE O REFRESH N EXISTIR MAIS NO REDIS PODEMOS LANÇAR QUE O USUARIO NÃO ESTA AUTORIZADO
         if (!redisToken)
           throw new UnauthorizedException('Usuario não autenticado');
-        // Tendo o refresh token no redis, gerar um novo access_token e refresh token, salvar o novo no redis, apagar o antigo e enviar
-        // para o usuario o novo access_token e refresh_token
+
+        // SE O REFRESH EXISTIR NO REDIS, VAMOS ISOLAR O REFRESH_TOKEN DE SUA CHAVE NO OBJETO DE RESPOSTA
         const { refresh_token: redisRefreshToken } = redisToken as unknown as {
           refresh_token: string;
         };
+
+        // VAMOS VALIDAR O TOKEN PARA CONSEGUIR RETIRAR O PAYLOAD DELE
         const redisPayload = this.jwtService.verify(redisRefreshToken, {
           secret: process.env.REFRESH_TOKEN_SECRET,
         });
         console.log('redisPayload: ', redisPayload);
+
+        // ISOLAMOS OS DADOS DO PAYLOAD RETIRANDO IA EXP DO NOVO PAYLOAD
         const { id, username, email } =
           (redisPayload as unknown as {
             id: string;
             username: string;
             email: string;
           }) || undefined;
+
+        // DEFINIMOS UM NOVO PAYLOAD
         const payload = { id, username, email };
+
+        // GERAMOS UM NOVO ACCESS TOKEN
         const newAccessToken = await this.jwtService.signAsync(payload, {
           secret: process.env.SECRET_KEY,
-          expiresIn: '60s',
+          expiresIn: process.env.EXPIRESIN_ACCESS_TOKEN,
         });
+
+        // GERAMOS UM NOVO REFRESH TOKEN
         const newRefreshToken = await this.jwtService.signAsync(payload, {
           secret: process.env.REFRESH_TOKEN_SECRET,
-          expiresIn: '1d',
+          expiresIn: process.env.EXPIRESIN_REFRESH_TOKEN,
         });
-        const isTokenStored =  await this.redisCache.storeToken(newRefreshToken);
-        console.log('Token is stored value: ', isTokenStored);
-        request['user'] = redisPayload;
-        response.headers['refresh_token'] = newRefreshToken;
-        response.body['access_token'] = newAccessToken;
 
-        throw new UnauthorizedException('Token inválido');
+        // ATUALIZAMOS O REDIS COM O NOVO REFRESH TOKEN
+        const isTokenStored = await this.redisCache.storeToken(newRefreshToken);
+        console.log('Token is stored value: ', isTokenStored);
+
+        // DELETAMOS O ANTIGO TOKEN DO REDIS
+        if (isTokenStored) this.redisCache.deleteToken(refreshToken);
+
+        // DEFINIMOS UM CABEÇALHO CHAMADO USER COM O NOVO PAYLOAD
+        request['user'] = payload;
+        // DEFINIMOS O REFRESH TOKEN NO CABEÇALHO
+        response.setHeader('Refresh_token', newRefreshToken);
+        // DEFINIMOS UM ACCESS_TOKEN NO BODY
+        response.json({ access_token: newAccessToken });
+
+        return true;
       }
     } catch (error) {
       throw new UnauthorizedException('Usuario não autenticado');
     }
-    
     return true;
   }
 

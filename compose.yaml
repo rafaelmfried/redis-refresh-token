@@ -15,7 +15,9 @@ services:
       - NEST_DEBUG=true
       - SECRET_KEY=minha_chave_secreta_aqui_access
       - REFRESH_TOKEN_SECRET=minha_chave_secreta_aqui
-      - REDIS_TTL=18000
+      - REDIS_TTL=180000
+      - EXPIRESIN_ACCESS_TOKEN=90s
+      - EXPIRESIN_REFRESH_TOKEN=180s
     depends_on:
       - database
       - redis

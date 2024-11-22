@@ -24,7 +24,7 @@ import { AuthGuard } from './auth.guard';
     AppCacheModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, BcryptService, UsersService],
+  providers: [AuthService, BcryptService, UsersService, AuthGuard],
   exports: [AuthService],
 })
 export class AuthModule {}
