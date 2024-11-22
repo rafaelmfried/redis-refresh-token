@@ -20,24 +20,32 @@ export class AuthService {
         loginAuthDto.username,
       );
 
-      if (!user) throw new UnauthorizedException();
+      if (!user)
+        throw new UnauthorizedException('Problemas nas credenciais fornecidas');
 
       const { password: hashPassword, ...payload } = user;
 
-      const isValidToken = await this.bcryptService.comparePassword(
+      const isValidPassword = await this.bcryptService.comparePassword(
         loginAuthDto.password,
         hashPassword,
       );
 
-      if (!isValidToken) throw new UnauthorizedException();
+      if (!isValidPassword)
+        throw new UnauthorizedException('Problemas nas credenciais fornecidas');
 
-      const access_token = await this.jwtService.signAsync(payload);
-      const refresh_token = await this.jwtService.signAsync(payload);
-      await this.redisCache.storeToken(refresh_token);
-      return { access_token };
+      const access_token = await this.jwtService.signAsync(payload, {
+        secret: process.env.SECRET_KEY,
+        expiresIn: '30s',
+      });
+      const refresh_token = await this.jwtService.signAsync(payload, {
+        secret: process.env.REFRESH_TOKEN_SECRET,
+        expiresIn: '180s',
+      });
+      const resultSave = await this.redisCache.storeToken(refresh_token);
+      console.log(resultSave);
+      return { access_token, refresh_token };
     } catch (error) {
-      console.error(error);
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Problemas nas credenciais fornecidas');
     }
   }
 }

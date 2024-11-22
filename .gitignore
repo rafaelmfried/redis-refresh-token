@@ -57,3 +57,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Commit Message File
 *.temp
+
+# DevTools Nestjs
+graph.json
+graphNormal.json

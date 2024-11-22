@@ -13,11 +13,14 @@ services:
       - NODE_ENV=development
       - REDIS_URL=redis://redis:6379
       - NEST_DEBUG=true
+      - SECRET_KEY=minha_chave_secreta_aqui_access
+      - REFRESH_TOKEN_SECRET=minha_chave_secreta_aqui
+      - REDIS_TTL=18000
     depends_on:
       - database
       - redis
     restart: always
-    command: npm run start:dev
+    command: npm run start:debug
     networks:
       - app_network
   

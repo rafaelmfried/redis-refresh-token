@@ -13,12 +13,11 @@ export class CacheService {
   }
 
   async storeToken(refresh_token: string): Promise<boolean> {
-    console.log('service: ', refresh_token);
     try {
       await this.cacheManager.set(
         refresh_token,
         { refresh_token },
-        300_000_000,
+        parseInt(process.env.REDIS_TTL),
       );
       return true;
     } catch (error) {

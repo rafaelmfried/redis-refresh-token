@@ -10,6 +10,7 @@ import { UsersModule } from 'src/users/users.module';
 import { CommonModule } from 'src/commom/common.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { AuthGuard } from './auth.guard';
 
 @Module({
   imports: [
@@ -19,8 +20,6 @@ import { User } from 'src/users/entities/user.entity';
     DatabaseModule,
     JwtModule.register({
       global: true,
-      secret: process.env.SECRET_KEY || 'chave',
-      signOptions: { expiresIn: '1h' },
     }),
     AppCacheModule,
   ],
