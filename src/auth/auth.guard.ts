@@ -84,9 +84,12 @@ export class AuthGuard implements CanActivate {
         if (isTokenStored) this.redisCache.deleteToken(refreshToken);
 
         // DEFINIMOS UM CABEÇALHO CHAMADO USER COM O NOVO PAYLOAD
-        request['user'] = payload;
         // DEFINIMOS O REFRESH TOKEN NO CABEÇALHO
-        response.setHeader('Refresh_token', newRefreshToken);
+        console.log('Payload to set user: ', payload);
+        request.user = payload;
+        console.log('Request set payload: ', request.user);
+
+        response.setHeader('refresh_token', newRefreshToken);
         // DEFINIMOS UM ACCESS_TOKEN NO BODY
         response.json({ access_token: newAccessToken });
 
