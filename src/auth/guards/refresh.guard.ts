@@ -26,19 +26,18 @@ export class RefreshGuard implements CanActivate {
 
     if (!redisToken) throw new UnauthorizedException('Refresh token invalido');
 
-    const verifiedPayload =
-      await this.authService.verifyRefreshToken(refresh_token);
+    const decoded = await this.authService.verifyRefreshToken(refresh_token);
 
-    if (!verifiedPayload)
+    if (!decoded)
       throw new UnauthorizedException('Erro ao verificar refresh token');
 
-    const { id, username, email } = verifiedPayload;
+    const { id, username, email } = decoded;
 
     const payload = { id, username, email };
 
     const accessToken = await this.authService.generateAccessToken(payload);
     const refreshToken = await this.authService.generateRefreshToken(payload);
-    // DELETAMOS O ANTIGO TOKEN DO REDIS
+    // Gerou um novo deletamos o antigo do redis, caso não iremos manter o antigo e devemos deletar o novo.
     if (refreshToken) this.redisCache.deleteToken(refresh_token);
 
     request.user = payload;

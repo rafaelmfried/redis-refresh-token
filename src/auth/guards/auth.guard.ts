@@ -18,9 +18,7 @@ export class AuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException('Usuario nao autenticado');
 
     const payload = await this.authService.verifyAccessToken(token);
-    console.log('Is Valid Token: ', payload);
     request.user = payload;
-    console.log('Request set payload: ', request.user);
 
     return true;
   }

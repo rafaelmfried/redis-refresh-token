@@ -79,8 +79,6 @@ export class AuthService {
 
       const isCachedToken = await this.redisCache.storeToken(refreshToken);
 
-      console.log('Cached token: ', isCachedToken);
-
       if (!isCachedToken)
         throw new InternalServerErrorException(
           'Erro para salvar refresh token',

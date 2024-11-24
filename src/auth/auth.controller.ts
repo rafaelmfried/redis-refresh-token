@@ -39,7 +39,6 @@ export class AuthController {
     @Req()
     request: Request,
   ) {
-    console.log('Request Controller User: ', request.user);
     return request.user;
   }
 }
