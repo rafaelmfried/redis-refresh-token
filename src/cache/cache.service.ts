@@ -7,14 +7,12 @@ export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async retrieveToken(refresh_token: string): Promise<string> | null {
-    console.log(refresh_token);
     const storedData = await this.cacheManager.get<string>(refresh_token);
     return storedData || null;
   }
 
   async storeToken(refresh_token: string): Promise<boolean> {
     try {
-      console.log(process.env.REDIS_TTL);
       await this.cacheManager.set(
         refresh_token,
         { refresh_token },
@@ -22,7 +20,6 @@ export class CacheService {
       );
       return true;
     } catch (error) {
-      console.error(error);
       return false;
     }
   }
