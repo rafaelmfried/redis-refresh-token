@@ -10,7 +10,8 @@ import { UsersModule } from 'src/users/users.module';
 import { CommonModule } from 'src/commom/common.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from './guards/auth.guard';
+import { RefreshGuard } from './guards/refresh.guard';
 
 @Module({
   imports: [
@@ -24,7 +25,13 @@ import { AuthGuard } from './auth.guard';
     AppCacheModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, BcryptService, UsersService, AuthGuard],
+  providers: [
+    AuthService,
+    BcryptService,
+    UsersService,
+    AuthGuard,
+    RefreshGuard,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

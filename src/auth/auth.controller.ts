@@ -8,10 +8,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginAuthDto } from './dto/login-auth.dto';
-import { AuthGuard } from './auth.guard';
+
 import { Request } from 'express';
+
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { AuthService } from './auth.service';
+import { AuthGuard } from './guards/auth.guard';
+import { RefreshGuard } from './guards/refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +25,10 @@ export class AuthController {
   async signIn(@Body() loginAuthDto: LoginAuthDto) {
     return await this.authService.signIn(loginAuthDto);
   }
+
+  @UseGuards(RefreshGuard)
+  @Get('refresh')
+  async RefreshToken() {}
 
   @Get()
   async signOut() {}
